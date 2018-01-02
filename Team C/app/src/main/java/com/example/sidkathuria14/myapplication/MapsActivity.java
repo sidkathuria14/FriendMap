@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
@@ -232,10 +233,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch (item.getItemId()){
             case R.id.addFriend :
-//TODO
+startActivity(new Intent(MapsActivity.this,AddFriend.class));
                 return true;
             case R.id.geofencing:
-//TODO
+startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
                 return true;
             default: return super.onOptionsItemSelected(item);
         }

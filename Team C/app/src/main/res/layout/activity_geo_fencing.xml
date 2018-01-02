@@ -4,11 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sidkathuria14.myapplication.AddFriend">
+    android:orientation="vertical"
+    tools:context="com.example.sidkathuria14.myapplication.GeoFencingActivity">
+    <Switch
+        android:textSize="30dp"
+        android:text="geofencing enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 <TextView
-    android:text="add friend activity"
-    android:textSize="40dp"
+    android:text="geofencing activity"
+    android:textSize="30dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
-
 </LinearLayout>
