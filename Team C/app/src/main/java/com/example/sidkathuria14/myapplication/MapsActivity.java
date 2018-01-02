@@ -11,9 +11,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,12 +42,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.R.attr.type;
+
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
     GoogleApiClient googleApiClient;
     public static final int MY_LOCATION_REQUEST_CODE = 111;
-    boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage;
+    boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage;Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +65,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-        etMessage = (EditText)findViewById(R.id.etMessage);
+
+
+
+         etMessage = (EditText)findViewById(R.id.etMessage);
 //        etDefault = (EditText)findViewById(R.id.etDefault);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        ((Button)findViewById(R.id.quicksend)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+//                builder.setTitle("Animation Dialog");
+                builder.setTitle("choose a friend");
+
+                builder.setPositiveButton("select",null);
+                builder.setNegativeButton("cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogTheme; //style id
+                dialog.show();
+            }
+        });
         ((Button) findViewById(R.id.btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -188,4 +218,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            }
 //        }
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu,menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.addFriend :
+//TODO
+                return true;
+            case R.id.geofencing:
+//TODO
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+
+
+    }
+
+
 }
