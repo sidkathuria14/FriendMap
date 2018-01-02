@@ -11,6 +11,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -36,7 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     GoogleApiClient googleApiClient;
     public static final int MY_LOCATION_REQUEST_CODE = 111;
-    boolean bPermissionGranted;
+    boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +52,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
+        etMessage = (EditText)findViewById(R.id.etMessage);
+//        etDefault = (EditText)findViewById(R.id.etDefault);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
+        ((Button) findViewById(R.id.btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+//                whatsappIntent.setType("text/plain");
+//                whatsappIntent.setPackage("com.whatsapp");
+//                whatsappIntent.putExtra(Intent.EXTRA_TEXT, "The text you wanted to share");
+//                try {
+//                    startActivity(whatsappIntent);
+//                } catch (android.content.ActivityNotFoundException ex) {
+////            Toast("Whatsapp have not been installed.");
+//                    Toast.makeText(MapsActivity.this, "Whatsapp has not been installed.", Toast.LENGTH_SHORT).show();
+//                }
+               message =  etMessage.getText().toString();
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT, message  );
+                startActivity(Intent.createChooser(share, "Share using"));
+            }
 
+        });
+
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
