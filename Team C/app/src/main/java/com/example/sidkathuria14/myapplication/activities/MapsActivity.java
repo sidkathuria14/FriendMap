@@ -40,6 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -48,7 +49,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
+public class MapsActivity extends SigninActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener
 //        , LocationListener
@@ -64,15 +65,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String TAG = "maps";
     GoogleApiClient googleApiClient;
     public static final int MY_LOCATION_REQUEST_CODE = 111;
-    boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage;Spinner spinner;
+    boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage = "Hey there! I am currently at - ";Spinner spinner;
     Location currentLocation;
     GoogleMap googleMap;
     LocationManager locMan;LocationListener locLis;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
 
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -146,7 +150,7 @@ geocoder= new Geocoder(this, Locale.getDefault());
                 } catch(IOException ioe){
 
                 }
-                etMessage.setText(etMessage.getText().toString() +
+                etMessage.setText(defaultMessage +
 //                        " ( " + lat + " , " + lng + " )" +
                         "  " + addressList.get(0).getAddressLine(0));
 //                        latlng );
@@ -374,6 +378,8 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
             case R.id.geofencing:
 startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
                 return true;
+            case R.id.signOut:
+                signOut();
             default: return super.onOptionsItemSelected(item);
         }
 

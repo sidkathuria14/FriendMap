@@ -25,8 +25,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    //for shake detection
 
-
+    //for geofencing
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-maps:11.0.0'
@@ -36,14 +37,12 @@ dependencies {
     compile 'com.google.android.gms:play-services:11.0.0'
     compile 'com.google.api.client:google-api-client-parent:1.4.1-beta'
     compile 'info.guardianproject.panic:panic:0.5'
-
-    //for shake detection
     compile 'com.squareup:seismic:1.0.2'
-
-    //for geofencing
     compile 'com.mapzen.android:lost:2.0.0'
     testCompile 'junit:junit:4.12'
 }
+
+
 
 
 

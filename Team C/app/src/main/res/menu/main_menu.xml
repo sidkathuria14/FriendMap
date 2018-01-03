@@ -12,4 +12,8 @@
 <item
     android:title="settings"
     android:id="@+id/settings"/>
+    <item
+        android:title="signout"
+        android:id="@+id/signOut"
+        ></item>
 </menu>
