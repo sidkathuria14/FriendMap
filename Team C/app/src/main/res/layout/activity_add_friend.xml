@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sidkathuria14.myapplication.AddFriend">
+    tools:context="com.example.sidkathuria14.myapplication.activities.AddFriend">
 <TextView
     android:text="add friend activity"
     android:textSize="40dp"

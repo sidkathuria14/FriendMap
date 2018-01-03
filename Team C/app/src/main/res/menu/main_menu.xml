@@ -9,5 +9,7 @@
     android:title="add a friend!"
     android:id="@+id/addFriend">
 </item>
-
+<item
+    android:title="settings"
+    android:id="@+id/settings"/>
 </menu>

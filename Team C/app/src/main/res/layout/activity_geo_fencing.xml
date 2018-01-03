@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.sidkathuria14.myapplication.GeoFencingActivity">
+    tools:context="com.example.sidkathuria14.myapplication.activities.GeoFencingActivity">
     <Switch
         android:textSize="30dp"
         android:text="geofencing enabled"
