@@ -3,6 +3,8 @@ package com.example.sidkathuria14.myapplication.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import com.example.sidkathuria14.myapplication.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,13 +39,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 //import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener
+//        , LocationListener
 
 {
+    List<Address> addressList;
+
+
+    Geocoder geocoder;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    public   String latlng;
     private GoogleMap mMap;
     public static final String TAG = "maps";
     GoogleApiClient googleApiClient;
@@ -65,7 +82,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 checkLocationPermission();
             }
 
-
+geocoder= new Geocoder(this, Locale.getDefault());
 
             etMessage = (EditText) findViewById(R.id.etMessage);
 //etMessage.setText(getLocation());
@@ -109,6 +126,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         locLis = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+
                 String lat,lng;
                 Log.d(TAG, "lat: " + location.getLatitude());
                 Log.d(TAG, "lng: " + location.getLongitude());
@@ -118,7 +136,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d(TAG, "speed: " + location.getSpeed());
                 lat = String.valueOf(location.getLatitude());
                 lng = String.valueOf(location.getLongitude());
-                etMessage.setText(etMessage.getText().toString() +   " ( " + lat + " , " + lng + " )");
+                latlng = "("+lat + "," + lng +")";
+                try {
+                    addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
+                    if(addressList.size() >0){
+                        Log.d(TAG, "onLocationChanged: " + addressList.get(0));
+                    }
+
+                } catch(IOException ioe){
+
+                }
+                etMessage.setText(etMessage.getText().toString() +
+//                        " ( " + lat + " , " + lng + " )" +
+                        "  " + addressList.get(0).getAddressLine(0));
+//                        latlng );
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(new LatLng(
+//            mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude())
+                                location.getLatitude(),location.getLongitude())
+                        ,7.0f)));
             }
 
             @Override
@@ -136,7 +171,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         };
-
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) &&
 
@@ -191,7 +225,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 ////       Log.d(TAG, "getLocation: string latitude " + loc );
 ////       return loc;
 //    }
+public void getAddress(double lat,double lng){
 
+}
     @SuppressWarnings("MissingPermission")
     void startLocationTracking () {
 
@@ -201,6 +237,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 10,
                 locLis
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -231,20 +278,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 //        CameraPosition.builder(new LatLng(mMap.getMyLocation().getLatitude(),
 //                mMap.getMyLocation().getLongitude()),0.4f,20°,);
-//        mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(mMap.getMyLocation().getLatitude(),
-//                mMap.getMyLocation().getLongitude())));
+//        mMap.animateCamera(CameraUpdateFactory.newLatLng(
+////                new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude())));
+//                new LatLng(latlng[])  ));
 //        currentLocation = new Location(new LatLng(mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude()),"");
 //        currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 //        Log.d(TAG, "onMapReady: " + String.valueOf(currentLocation.getLatitude()));
+//mMap.moveCamera(CameraUpdateFactory.zoomBy(1.8f));
+//        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(new LatLng(mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude()),2.0f)));
+        Log.d(TAG, "onMapReady: " + latlng);
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng));
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,7.0f)));
 
-
+            }
+        });
 
     }
 
 
-public void function(GoogleMap googleMap){
-    mMap = googleMap;
-}
 
     public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
@@ -300,41 +355,6 @@ public void function(GoogleMap googleMap){
 //                return;
 //            }
 //
-//        }
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera. In this case,
-         * we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to install
-         * it inside the SupportMapFragment. This method will only be triggered once the user has
-         * installed Google Play services and returned to the app.
-         */
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//        mMap = googleMap;
-//Location myLocation = mMap.getMyLocation();
-//        LatLng latLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
-//        // Add a marker in Sydney and move the camera
-//        mMap.setMyLocationEnabled(true);
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//    }
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        if (requestCode == MY_LOCATION_REQUEST_CODE) {
-//            if (permissions.length == 1 &&
-//                    permissions[0] == android.Manifest.permission.ACCESS_FINE_LOCATION &&
-//                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                mMap.setMyLocationEnabled(true);
-//            } else {
-//                // Permission was denied. Display an error message.
-//                Toast.makeText(this, "GPS needs to be switched on for this application", Toast.LENGTH_SHORT).show();
-//                finish();
-//            }
-//        }
-
 
 
     @Override
@@ -376,23 +396,6 @@ startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
         Log.d(TAG, "onConnectionFailed: ");
     }
 
-//    @Override
-//    public void onLocationChanged(Location location) {
-//        Log.d(TAG, "onLocationChanged: ");
-//    }
-//
-//    @Override
-//    public void onStatusChanged(String s, int i, Bundle bundle) {
-//        Log.d(TAG, "onStatusChanged: ");
-//    }
-//
-//    @Override
-//    public void onProviderEnabled(String s) {
-//        Log.d(TAG, "onProviderEnabled: ");
-//    }
-//
-//    @Override
-//    public void onProviderDisabled(String s) {
-//        Log.d(TAG, "onProviderDisabled: ");
-//    }
+
+
 }
