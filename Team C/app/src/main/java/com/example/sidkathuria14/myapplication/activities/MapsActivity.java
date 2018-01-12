@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.R;
@@ -62,7 +63,7 @@ public class MapsActivity extends SigninActivity implements OnMapReadyCallback,
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     public   String latlng;
     private GoogleMap mMap;
-    public static final String TAG = "maps";
+
     GoogleApiClient googleApiClient;
     public static final int MY_LOCATION_REQUEST_CODE = 111;
     boolean bPermissionGranted;EditText etMessage,etDefault;String message,defaultMessage = "Hey there! I am currently at - ";Spinner spinner;
@@ -191,44 +192,7 @@ geocoder= new Geocoder(this, Locale.getDefault());
         }
 
     }
-//    public String test(String str){
-//
-//    }
-//   public String getLocation(){
-//       String loc;
-//       locLis = new LocationListener() {
-//          String loc1;
-//           @Override
-//           public void onLocationChanged(Location location) {
-//               Log.d(TAG, "lat: " + location.getLatitude());
-//               Log.d(TAG, "lng: " + location.getLongitude());
-//               Log.d(TAG, "prov: " + location.getProvider());
-//               Log.d(TAG, "accuracy: " + location.getAccuracy());
-//               Log.d(TAG, "alt: " + location.getAltitude());
-//               Log.d(TAG, "speed: " + location.getSpeed());
-//           loc1 = String.valueOf(location.getLatitude());
-//               etMessage.setText(loc1);
-//
-//           }
-//
-//           @Override
-//           public void onStatusChanged(String s, int i, Bundle bundle) {
-//
-//           }
-//
-//           @Override
-//           public void onProviderEnabled(String s) {
-//
-//           }
-//
-//           @Override
-//           public void onProviderDisabled(String s) {
-//
-//           }
-//       };
-////       Log.d(TAG, "getLocation: string latitude " + loc );
-////       return loc;
-//    }
+
 public void getAddress(double lat,double lng){
 
 }
@@ -379,7 +343,7 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
 startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
                 return true;
             case R.id.signOut:
-                signOut();
+//                signOut();
             default: return super.onOptionsItemSelected(item);
         }
 

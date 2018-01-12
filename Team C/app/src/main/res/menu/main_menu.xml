@@ -16,4 +16,7 @@
         android:title="signout"
         android:id="@+id/signOut"
         ></item>
+    <item
+        android:title="My QR"
+        android:id="@+id/myqr"></item>
 </menu>

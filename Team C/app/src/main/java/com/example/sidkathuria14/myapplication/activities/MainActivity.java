@@ -45,9 +45,11 @@ import java.util.Set;
 import info.guardianproject.panic.Panic;
 import info.guardianproject.panic.PanicTrigger;
 
+import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
+
 public class MainActivity extends ListActivity {
 
-    public static final String TAG = "FakePanicButton";
+
 
     private static final int CONTACT_PICKER_RESULT = 0x00;
     private static final int CONNECT_RESULT = 0x01;
