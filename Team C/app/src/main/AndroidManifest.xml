@@ -102,17 +102,18 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps">
+
+        </activity>
         <activity android:name=".activities.AddFriend">
-            <intent-filter>
+
+        </activity>
+        <activity android:name=".activities.GeoFencingActivity" />
+        <activity android:name=".activities.SignupActivity">    <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
-        <activity android:name=".activities.GeoFencingActivity" />
-        <activity android:name=".activities.SigninActivity"></activity>
-        <activity android:name=".activities.SignupActivity"></activity>
+        </intent-filter></activity>
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.ResetPasswordActivity" />
         <activity android:name=".activities.MyQR">

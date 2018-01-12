@@ -24,15 +24,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import static com.example.sidkathuria14.myapplication.R.id.map;
 import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
-import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -44,20 +43,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
-public class MapsActivity extends SigninActivity implements OnMapReadyCallback,
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener
 //        , LocationListener
 
 {
     List<Address> addressList;
-
+String mapAddress;
 
     Geocoder geocoder;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -80,8 +76,8 @@ public class MapsActivity extends SigninActivity implements OnMapReadyCallback,
         FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
 
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
+            final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(map);
             mapFragment.getMapAsync(this);
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 checkLocationPermission();
@@ -142,6 +138,7 @@ geocoder= new Geocoder(this, Locale.getDefault());
                 lat = String.valueOf(location.getLatitude());
                 lng = String.valueOf(location.getLongitude());
                 latlng = "("+lat + "," + lng +")";
+                mapAddress = " http://maps.google.com/maps?q=loc:" + lat + "," + lng;
                 try {
                     addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
                     if(addressList.size() >0){
@@ -153,7 +150,7 @@ geocoder= new Geocoder(this, Locale.getDefault());
                 }
                 etMessage.setText(defaultMessage +
 //                        " ( " + lat + " , " + lng + " )" +
-                        "  " + addressList.get(0).getAddressLine(0));
+                        "  " + addressList.get(0).getAddressLine(0) + mapAddress);
 //                        latlng );
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(new LatLng(
 //            mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude())
