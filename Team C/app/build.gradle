@@ -37,6 +37,7 @@ dependencies {
     compile 'com.google.firebase:firebase-database:10.0.1'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.android.gms:play-services:11.0.0'
+    compile 'com.google.android.gms:play-services-places:11.0.0'
     compile 'com.google.api.client:google-api-client-parent:1.4.1-beta'
     compile 'info.guardianproject.panic:panic:0.5'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'

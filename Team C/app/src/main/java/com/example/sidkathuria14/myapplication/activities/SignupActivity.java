@@ -34,7 +34,7 @@ public class SignupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
-etName = (EditText)findViewById(R.id.name);git
+etName = (EditText)findViewById(R.id.name);
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
 

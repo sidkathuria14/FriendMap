@@ -3,6 +3,7 @@ package com.example.sidkathuria14.myapplication.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,14 +31,26 @@ import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 
 import com.example.sidkathuria14.myapplication.R;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 //import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -45,20 +58,23 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+        GoogleApiClient.OnConnectionFailedListener,
+        PlaceSelectionListener
 //        , LocationListener
 
 {
     List<Address> addressList;
-String mapAddress;
-
+    String mapAddress;
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     Geocoder geocoder;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     public   String latlng;
     private GoogleMap mMap;
+    GoogleApiClient mGoogleApiClient;
 
     GoogleApiClient googleApiClient;
     public static final int MY_LOCATION_REQUEST_CODE = 111;
@@ -72,9 +88,17 @@ String mapAddress;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        ((Button)findViewById(R.id.startgeofencing)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
             final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(map);
@@ -263,6 +287,41 @@ public void getAddress(double lat,double lng){
         });
 
     }
+//    private void startGeofence() {
+//        Log.i(TAG, "startGeofence()");
+//        if( geoFencemarker != null ) {
+//            Geofence geofence = createGeofence( geoFencemarker.getPosition(), GEOFENCE_RADIUS );
+//            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+//            addGeofence( geofenceRequest );
+//        } else {
+//            Log.e(TAG, "Geofence marker is null");
+//        }
+//    }
+//    private void addGeofence(GeofencingRequest request) {
+//        Log.d(TAG, "addGeofence");
+//        if (checkLocationPermission()) {
+//            PendingResult<Status> result = LocationServices.GeofencingApi.addGeofences(
+//                    mGoogleApiClient,
+//                    request,
+//                    createGeofencePendingIntent()
+//            );
+//            result.setResultCallback(this);
+//        }
+//    }
+//    private void drawGeofence() {
+//        Log.d(TAG, "drawGeofence()");
+//
+//        if ( geoFenceLimits != null )
+//            geoFenceLimits.remove();
+//
+//        CircleOptions circleOptions = new CircleOptions()
+//                .center( geoFencemarker.getPosition())
+//                .strokeColor(Color.argb(50, 70,70,70))
+//                .fillColor( Color.argb(100, 150,150,150) )
+//                .radius( GEOFENCE_RADIUS );
+//        geoFenceLimits = map.addCircle( circleOptions );
+//    }
+
 
 
 
@@ -320,7 +379,39 @@ public void getAddress(double lat,double lng){
 //                return;
 //            }
 //
-
+public void geoFence(){
+//    PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+//            getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+//
+//    autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//        @Override
+//        public void onPlaceSelected(Place place) {
+//            // TODO: Get info about the selected place.
+//            Log.i(TAG, "Place: " + place.getName());
+//            mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
+//            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(place.getLatLng(),7.0f)));
+//        }
+//
+//        @Override
+//        public void onError(Status status) {
+//            // TODO: Handle the error.
+//            Log.i(TAG, "An error occurred: " + status);
+//        }
+//    });
+//
+//
+//
+//    try {
+//        Intent intent =
+//                new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+//                        .build(this);
+//        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+//    } catch (GooglePlayServicesRepairableException e) {
+//        // TODO: Handle the error.
+//    } catch (GooglePlayServicesNotAvailableException e) {
+//        // TODO: Handle the error.
+//    }
+}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -337,7 +428,8 @@ public void getAddress(double lat,double lng){
 startActivity(new Intent(MapsActivity.this,AddFriend.class));
                 return true;
             case R.id.geofencing:
-startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
+//startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
+                geoFence();
                 return true;
             case R.id.signOut:
 //                signOut();
@@ -347,6 +439,23 @@ startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Log.i(TAG, "Place: " + place.getName());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.i(TAG, status.getStatusMessage());
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -364,5 +473,17 @@ startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
     }
 
 
+    @Override
+    public void onPlaceSelected(Place place) {
+        Log.d(TAG, "onPlaceSelected: " + place.getName());
+        if (mMap != null) {
+            mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(place.getLatLng(), 7.0f)));
+        }
+    }
 
+    @Override
+    public void onError(Status status) {
+        Log.d(TAG, "onError: ");
+    }
 }
