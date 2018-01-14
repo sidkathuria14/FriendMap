@@ -1,6 +1,7 @@
 package com.example.sidkathuria14.myapplication.activities;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -29,6 +30,7 @@ import android.widget.Spinner;
 import static com.example.sidkathuria14.myapplication.R.id.map;
 import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 
+import com.example.sidkathuria14.myapplication.GeoFenceTransitionService;
 import com.example.sidkathuria14.myapplication.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -51,8 +53,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 //import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -64,14 +68,14 @@ import java.util.Map;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        PlaceSelectionListener
-//        ResultCallback<Status>
+        PlaceSelectionListener,
+        ResultCallback<Status>
+    ,GoogleMap.OnMarkerClickListener
 //        , LocationListener
 
 {
     List<Address> addressList;
     String mapAddress;
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     Geocoder geocoder;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     public   String latlng;
@@ -85,17 +89,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap googleMap;
     LocationManager locMan;LocationListener locLis;
 
+
+    private final int UPDATE_INTERVAL =  1000;
+    private final int FASTEST_INTERVAL = 900;
+    private final int REQ_PERM_CODE=111;
+    private static final long GEO_DURATION = 60 * 60 * 1000;
+    private static final String GEOFENCE_REQ_ID = "My Geofence";
+    private static final float GEOFENCE_RADIUS = 500.0f; // in meters
+    private final int GEOFENCE_REQ_CODE = 0;
+    private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private final int PLACE_PICKER_REQUEST = 2;
+    private Circle geoFenceLimits;
+    private PendingIntent geoFencePendingIntent;
+    private Marker geoFencemarker;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        ((Button)findViewById(R.id.startgeofencing)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
 
 //        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
@@ -108,6 +121,9 @@ autocompleteFragment.setOnPlaceSelectedListener(this);
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 checkLocationPermission();
             }
+
+        createGoogleAPIClient();
+        mGoogleApiClient.connect();
 
 geocoder= new Geocoder(this, Locale.getDefault());
 
@@ -204,6 +220,12 @@ geocoder= new Geocoder(this, Locale.getDefault());
         } else {
             startLocationTracking();
         }
+        ((Button)findViewById(R.id.startgeofencing)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startGeofence();
+            }
+        });
 
     }
 
@@ -274,47 +296,116 @@ public void getAddress(double lat,double lng){
             public void onMapClick(LatLng latLng) {
                 float zoomlevel = mMap.getCameraPosition().zoom;
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(latLng));
-                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,zoomlevel)));
+                markerForGeofence(latLng);
+//                mMap.addMarker(new MarkerOptions().position(latLng));
+//                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,zoomlevel)));
 
             }
         });
 
     }
-//    private void startGeofence() {
-//        Log.i(TAG, "startGeofence()");
-//        if( geoFencemarker != null ) {
-//            Geofence geofence = createGeofence( geoFencemarker.getPosition(), GEOFENCE_RADIUS );
-//            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
-//            addGeofence( geofenceRequest );
-//        } else {
-//            Log.e(TAG, "Geofence marker is null");
-//        }
-//    }
-//    private void addGeofence(GeofencingRequest request) {
-//        Log.d(TAG, "addGeofence");
-//        if (checkLocationPermission()) {
-//            PendingResult<Status> result = LocationServices.GeofencingApi.addGeofences(
-//                    mGoogleApiClient,
-//                    request,
-//                    createGeofencePendingIntent()
-//            );
-//            result.setResultCallback(this);
-//        }
-//    }
-//    private void drawGeofence() {
-//        Log.d(TAG, "drawGeofence()");
-//
-//        if ( geoFenceLimits != null )
-//            geoFenceLimits.remove();
-//
-//        CircleOptions circleOptions = new CircleOptions()
-//                .center( geoFencemarker.getPosition())
-//                .strokeColor(Color.argb(50, 70,70,70))
-//                .fillColor( Color.argb(100, 150,150,150) )
-//                .radius( GEOFENCE_RADIUS );
-//        geoFenceLimits = map.addCircle( circleOptions );
-//    }
+    private void markerForGeofence(LatLng latLng){
+        Log.i(TAG, "markerForGeofence: ");
+        String title ="lat:"+latLng.latitude+"long :"+latLng.longitude;
+        MarkerOptions markerOptions= new MarkerOptions()
+                .position(latLng)
+                .title(title);
+        if(mMap!=null) {
+            if (geoFencemarker!= null) {
+                geoFencemarker.remove();
+            }
+            geoFencemarker = mMap.addMarker(markerOptions);
+        }
+    }
+    private void startGeofence() {
+        Log.i(TAG, "startGeofence()");
+        if( geoFencemarker != null ) {
+            Geofence geofence = createGeofence( geoFencemarker.getPosition(), GEOFENCE_RADIUS );
+            GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+            addGeofence( geofenceRequest );
+        } else {
+            Log.e(TAG, "Geofence marker is null");
+        }
+    }
+    private Geofence createGeofence(LatLng latLng, float radius ) {
+        Log.d(TAG, "createGeofence");
+        Log.d(TAG, "createGeofence: "+latLng.latitude+":"+latLng.longitude);
+        return new Geofence.Builder()
+                .setRequestId(GEOFENCE_REQ_ID)
+                .setCircularRegion( latLng.latitude, latLng.longitude, radius)
+                .setExpirationDuration( GEO_DURATION )
+                .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
+                        | Geofence.GEOFENCE_TRANSITION_EXIT )
+                .build();
+    }
+
+    private GeofencingRequest createGeofenceRequest(Geofence geofence ) {
+        Log.d(TAG, "createGeofenceRequest");
+        return new GeofencingRequest.Builder()
+                .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
+                .addGeofence( geofence )
+                .build();
+    }
+    private void addGeofence(GeofencingRequest request) {
+        Log.d(TAG, "addGeofence");
+        if (checkLocationPermission()) {
+            PendingResult<Status> result = LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    request,
+                    createGeofencePendingIntent()
+            );
+            result.setResultCallback(this);
+        }
+    }
+
+    private void createGoogleAPIClient(){
+        Log.d(TAG, "createGoogleAPIClient: ");
+        if(mGoogleApiClient==null){
+            mGoogleApiClient=new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this,this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        Log.d(TAG, "createGoogleAPIClient: "+mGoogleApiClient);
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    private PendingIntent createGeofencePendingIntent() {
+        Log.d(TAG, "createGeofencePendingIntent");
+        if ( geoFencePendingIntent != null )
+            return geoFencePendingIntent;
+        Log.d(TAG, "createGeofencePendingIntent: " + "not null");
+        Intent intent = new Intent( this, GeoFenceTransitionService.class);
+        return PendingIntent.getService(
+                this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+    }
+
+    private void drawGeofence() {
+        Log.d(TAG, "drawGeofence()");
+
+        if ( geoFenceLimits != null )
+            geoFenceLimits.remove();
+
+        CircleOptions circleOptions = new CircleOptions()
+                .center( geoFencemarker.getPosition())
+                .strokeColor(Color.argb(50, 70,70,70))
+                .fillColor( Color.argb(100, 150,150,150) )
+                .radius( GEOFENCE_RADIUS );
+        geoFenceLimits = mMap.addCircle( circleOptions );
+    }
 
 
 
@@ -458,7 +549,7 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected: "  + String.valueOf(currentLocation.getLatitude()));
+//        Log.d(TAG, "onConnected: "  + String.valueOf(currentLocation.getLatitude()));
     }
 
     @Override
@@ -487,12 +578,17 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
         Log.d(TAG, "onError: ");
     }
 
-//    @Override
-//    public void onResult(@NonNull Status status) {
-//        if ( status.isSuccess() ) {
-//            drawGeofence();
-//        } else {
-//            // inform about fail
-//        }
-//    }
+    @Override
+    public void onResult(@NonNull Status status) {
+        if ( status.isSuccess() ) {
+            drawGeofence();
+        } else {
+            // inform about fail
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
 }

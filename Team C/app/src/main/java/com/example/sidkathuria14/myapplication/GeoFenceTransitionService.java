@@ -23,20 +23,21 @@ import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 /**
  * Created by sidkathuria14 on 13/1/18.
  */
 
 public class GeoFenceTransitionService extends IntentService {
-    private static final String TAG = "GeofenceLocation";
+
     public static final int GEOFENCE_NOTIFICATION_ID = 0;
     public static final String ACTION_SMS_SENT = "com.techblogon.android.apis.os.SMS_SENT_ACTION";
     public GeoFenceTransitionService() {
         super(GeoFenceTransitionService.class.getSimpleName());
+        Log.d(TAG, "GeoFenceTransitionService: ");
     }
-    public void onClickSend(View v)
-    {
+//    public void onClickSend(View v)
+//    {
         //Get recipient from user and check for null
 //        if (TextUtils.isEmpty(recipientTextEdit.getText())) {
 //            titleTextView.setText("Enter Receipent");
@@ -51,7 +52,7 @@ public class GeoFenceTransitionService extends IntentService {
 //            return;
 //        }
 
-    }
+//    }
 
 
     @Override
