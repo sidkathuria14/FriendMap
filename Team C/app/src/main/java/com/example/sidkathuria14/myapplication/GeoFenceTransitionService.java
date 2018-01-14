@@ -168,7 +168,7 @@ public class GeoFenceTransitionService extends IntentService {
     private Notification createNotification(String msg, PendingIntent notificationPendingIntent) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder
-                .setSmallIcon(R.drawable.ic_google)
+                .setSmallIcon(R.drawable.ic_location_pin)
 //                .setColor(Color.RED)
                 .setContentTitle(msg)
                 .setContentText("Geofence Notification!")

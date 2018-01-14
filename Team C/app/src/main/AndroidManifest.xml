@@ -39,6 +39,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -109,18 +110,18 @@
         <activity
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".activities.AddFriend">
 
         </activity>
         <activity android:name=".activities.GeoFencingActivity" />
         <activity android:name=".activities.SignupActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.ResetPasswordActivity" />

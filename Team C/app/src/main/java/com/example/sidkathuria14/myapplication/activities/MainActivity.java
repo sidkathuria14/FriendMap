@@ -61,8 +61,8 @@ public class MainActivity extends ListActivity {
     private String requestAction;
 
     private String displayName;
-    private String phoneNumber;
-    private String emailAddress = "test@test.foo";
+    private String phoneNumber = "8076997187";
+    private String emailAddress = "sidkathuria14@gmail.com";
 
     private BaseTrigger[] triggers;
 
