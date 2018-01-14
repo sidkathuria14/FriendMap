@@ -36,6 +36,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
@@ -64,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         PlaceSelectionListener
+//        ResultCallback<Status>
 //        , LocationListener
 
 {
@@ -95,11 +97,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
+//        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
+autocompleteFragment.setOnPlaceSelectedListener(this);
             final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(map);
             mapFragment.getMapAsync(this);
@@ -128,16 +130,7 @@ geocoder= new Geocoder(this, Locale.getDefault());
             ((Button) findViewById(R.id.btn)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
-//                whatsappIntent.setType("text/plain");
-//                whatsappIntent.setPackage("com.whatsapp");
-//                whatsappIntent.putExtra(Intent.EXTRA_TEXT, "The text you wanted to share");
-//                try {
-//                    startActivity(whatsappIntent);
-//                } catch (android.content.ActivityNotFoundException ex) {
-////            Toast("Whatsapp have not been installed.");
-//                    Toast.makeText(MapsActivity.this, "Whatsapp has not been installed.", Toast.LENGTH_SHORT).show();
-//                }
+
                     message = etMessage.getText().toString();
                     Intent share = new Intent(Intent.ACTION_SEND);
                     share.setType("text/plain");
@@ -279,9 +272,10 @@ public void getAddress(double lat,double lng){
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                float zoomlevel = mMap.getCameraPosition().zoom;
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng));
-                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,7.0f)));
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,zoomlevel)));
 
             }
         });
@@ -431,6 +425,11 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
 //startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
                 geoFence();
                 return true;
+            case R.id.myqr:
+                startActivity(new Intent(MapsActivity.this,MyQR.class));
+                return true;
+            case R.id.settings:
+//                startActivity(new Intent(MapsActivity.this,S));
             case R.id.signOut:
 //                signOut();
             default: return super.onOptionsItemSelected(item);
@@ -477,8 +476,9 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
     public void onPlaceSelected(Place place) {
         Log.d(TAG, "onPlaceSelected: " + place.getName());
         if (mMap != null) {
+            mMap.clear();
             mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(place.getLatLng(), 7.0f)));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(place.getLatLng(), 12.4f)));
         }
     }
 
@@ -486,4 +486,13 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
     public void onError(Status status) {
         Log.d(TAG, "onError: ");
     }
+
+//    @Override
+//    public void onResult(@NonNull Status status) {
+//        if ( status.isSuccess() ) {
+//            drawGeofence();
+//        } else {
+//            // inform about fail
+//        }
+//    }
 }
