@@ -52,8 +52,11 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
         <!-- for intercepting phone number dialed as panic trigger -->
+
         <service
             android:name=".geofencing.GeofenceTransitionsIntentService"
+            android:exported="false"></service>   <service
+            android:name=".GeoFenceTransitionService"
             android:exported="false"></service>
 
         <receiver

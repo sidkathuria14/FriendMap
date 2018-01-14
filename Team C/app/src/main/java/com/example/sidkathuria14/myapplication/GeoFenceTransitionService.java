@@ -1,5 +1,6 @@
 package com.example.sidkathuria14.myapplication;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.activities.MainActivity;
+import com.example.sidkathuria14.myapplication.activities.MapsActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
@@ -97,6 +99,7 @@ public class GeoFenceTransitionService extends IntentService {
             String geofenceTransitionDetails = getGeofenceTrasitionDetails(geoFenceTransition, triggeringGeofences );
             // Send notification details as a String
             sendNotification( geofenceTransitionDetails );
+//            createNotification("blah",intent);
         }
     }
 //    private void sendSMS(String phoneNumber, String message) {
@@ -146,10 +149,10 @@ public class GeoFenceTransitionService extends IntentService {
         Log.i(TAG, "sendNotification: " + msg );
 
         // Intent to start the main Activity
-//        Intent notificationIntent = new Intent(this, ConditionsActivity.class);
+        Intent notificationIntent = new Intent(this, MapsActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(MainActivity.class);
-//        stackBuilder.addNextIntent(notificationIntent);
+        stackBuilder.addNextIntent(notificationIntent);
         PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -165,8 +168,8 @@ public class GeoFenceTransitionService extends IntentService {
     private Notification createNotification(String msg, PendingIntent notificationPendingIntent) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
         notificationBuilder
-//                .setSmallIcon(R.drawable.ic_location_on_white_24dp)
-                .setColor(Color.RED)
+                .setSmallIcon(R.drawable.ic_google)
+//                .setColor(Color.RED)
                 .setContentTitle(msg)
                 .setContentText("Geofence Notification!")
                 .setContentIntent(notificationPendingIntent)

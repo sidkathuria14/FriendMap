@@ -291,6 +291,7 @@ public void getAddress(double lat,double lng){
 //mMap.moveCamera(CameraUpdateFactory.zoomBy(1.8f));
 //        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(new LatLng(mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude()),2.0f)));
         Log.d(TAG, "onMapReady: " + latlng);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -298,7 +299,7 @@ public void getAddress(double lat,double lng){
                 mMap.clear();
                 markerForGeofence(latLng);
 //                mMap.addMarker(new MarkerOptions().position(latLng));
-//                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,zoomlevel)));
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(latLng,zoomlevel)));
 
             }
         });
@@ -388,7 +389,7 @@ public void getAddress(double lat,double lng){
         if ( geoFencePendingIntent != null )
             return geoFencePendingIntent;
         Log.d(TAG, "createGeofencePendingIntent: " + "not null");
-        Intent intent = new Intent( this, GeoFenceTransitionService.class);
+        Intent intent = new Intent( MapsActivity.this, GeoFenceTransitionService.class);
         return PendingIntent.getService(
                 this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
     }
@@ -464,39 +465,7 @@ public void getAddress(double lat,double lng){
 //                return;
 //            }
 //
-public void geoFence(){
-//    PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-//            getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-//
-//    autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-//        @Override
-//        public void onPlaceSelected(Place place) {
-//            // TODO: Get info about the selected place.
-//            Log.i(TAG, "Place: " + place.getName());
-//            mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
-//            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(place.getLatLng(),7.0f)));
-//        }
-//
-//        @Override
-//        public void onError(Status status) {
-//            // TODO: Handle the error.
-//            Log.i(TAG, "An error occurred: " + status);
-//        }
-//    });
-//
-//
-//
-//    try {
-//        Intent intent =
-//                new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-//                        .build(this);
-//        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-//    } catch (GooglePlayServicesRepairableException e) {
-//        // TODO: Handle the error.
-//    } catch (GooglePlayServicesNotAvailableException e) {
-//        // TODO: Handle the error.
-//    }
-}
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -514,7 +483,7 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
                 return true;
             case R.id.geofencing:
 //startActivity(new Intent(MapsActivity.this, GeoFencingActivity.class));
-                geoFence();
+//                geoFence();
                 return true;
             case R.id.myqr:
                 startActivity(new Intent(MapsActivity.this,MyQR.class));
@@ -589,6 +558,7 @@ startActivity(new Intent(MapsActivity.this,AddFriend.class));
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        marker.setVisible(true);
         return false;
     }
 }
