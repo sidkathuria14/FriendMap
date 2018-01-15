@@ -7,7 +7,7 @@ package com.example.sidkathuria14.myapplication.models;
 public class User {
     public String name;
     public String email;
-
+public Friend[] friend;
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
     public User() {
@@ -17,4 +17,10 @@ public class User {
         this.name = name;
         this.email = email;
     }
+    public User(String name,String email,Friend[] friend){
+        this.name = name;
+        this.friend = friend;
+        this.email = email;
+    }
+
 }

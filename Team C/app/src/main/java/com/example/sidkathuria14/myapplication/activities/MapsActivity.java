@@ -3,6 +3,7 @@ package com.example.sidkathuria14.myapplication.activities;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -56,11 +57,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -95,7 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int REQ_PERM_CODE=111;
     private static final long GEO_DURATION = 60 * 60 * 1000;
     private static final String GEOFENCE_REQ_ID = "My Geofence";
-    private static final float GEOFENCE_RADIUS = 500.0f; // in meters
+    private static final float GEOFENCE_RADIUS = 50.0f; // in meters
     private final int GEOFENCE_REQ_CODE = 0;
     private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private final int PLACE_PICKER_REQUEST = 2;
@@ -103,12 +108,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private PendingIntent geoFencePendingIntent;
     private Marker geoFencemarker;
 
+    String uid;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-
+        FirebaseAuth auth= FirebaseAuth.getInstance();
+        FirebaseUser user= auth.getCurrentUser();
+        uid =  user.getUid();
+        Log.d("friendmap", "onCreate: " + uid);
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("firebase_uid",uid);
+        editor.commit();
 
 //        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
@@ -268,6 +280,18 @@ public void getAddress(double lat,double lng){
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Boolean isNight;
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if(hour < 6 || hour > 18){
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.night));
+        } else if(hour >12 && hour <18){
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.noon));
+        } else{
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.retro));
+        }
+
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //User has previously accepted this permission
             if (ActivityCompat.checkSelfPermission(this,
@@ -278,7 +302,11 @@ public void getAddress(double lat,double lng){
             //Not in api-23, no need to prompt
             mMap.setMyLocationEnabled(true);
         }
-//        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//        mMap.setMapType(R.string.style_map);
+//        mMap.setMapStyle(
+//                MapStyleOptions.loadRawResourceStyle(
+//                        this, R.string.style_map));
+
 //        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 //        CameraPosition.builder(new LatLng(mMap.getMyLocation().getLatitude(),
 //                mMap.getMyLocation().getLongitude()),0.4f,20°,);

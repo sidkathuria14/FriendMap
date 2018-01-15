@@ -16,11 +16,14 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.R;
+import com.example.sidkathuria14.myapplication.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -29,6 +32,8 @@ public class SignupActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     EditText etName;
+    private DatabaseReference mDatabase;
+    String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,9 @@ public class SignupActivity extends AppCompatActivity {
 etName = (EditText)findViewById(R.id.name);
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
+
+        mDatabase = FirebaseDatabase.getInstance().getReference("users");
+
 
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
         btnSignUp = (Button) findViewById(R.id.sign_up_button);
@@ -63,9 +71,13 @@ etName = (EditText)findViewById(R.id.name);
             @Override
             public void onClick(View v) {
 
-                String email = inputEmail.getText().toString().trim();
-                String password = inputPassword.getText().toString().trim();
-
+               final String email = inputEmail.getText().toString().trim();
+               final String password = inputPassword.getText().toString().trim();
+               final String name = etName.getText().toString();
+                if(TextUtils.isEmpty(name)){
+                    Toast.makeText(getApplicationContext(),"enter Name!",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
@@ -96,6 +108,10 @@ etName = (EditText)findViewById(R.id.name);
                                     Toast.makeText(SignupActivity.this, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
+//                                  userId = task.getResult().getUser().getUid();
+                                    userId = mDatabase.push().getKey();
+                                    User user = new User(name,email);
+                                    mDatabase.child(userId).setValue(user);
                                     startActivity(new Intent(SignupActivity.this, MapsActivity.class));
                                     finish();
                                 }

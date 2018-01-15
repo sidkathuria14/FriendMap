@@ -11,6 +11,11 @@ import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.R;
 import com.example.sidkathuria14.myapplication.models.User;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthProvider;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,11 +29,14 @@ import java.util.List;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class AddFriend extends AppCompatActivity implements ZXingScannerView.ResultHandler{
-EditText etInput;DatabaseReference mDatabase;
-   String email,userId;
-    public List<User> friendList ;
+public class AddFriend extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+    EditText etInput;
+    DatabaseReference mDatabase;
+    String email, userId;
+    public List<User> friendList;
     private ZXingScannerView mScannerView;
+    String uid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +64,71 @@ EditText etInput;DatabaseReference mDatabase;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Scan Result");
         builder.setMessage(result.getText());
+        uid = result.getText();
+        Log.d(TAG, "handleResult: addfriend zxing " + uid);
+//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser().getUid()
+        FirebaseDatabase.getInstance().getReference(uid).orderByChild("name")
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+User user = dataSnapshot.getValue(User.class);
+                        Log.d(TAG, "onChildAdded: final vala" + user.name);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        Log.d(TAG, "onChildChanged: ");
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "onChildRemoved: ");
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        Log.d(TAG, "onChildMoved: ");
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "onCancelled: " + databaseError);
+                    }
+                });
+
+
+//        Log.d(TAG, "handleResult: " + checkUID);
+//        FirebaseUser user = FirebaseAuth.getInstance().FirebaseDatabase.getInstance().getReference(uid).getDatabase();
+//                orderByKey().equalTo(uid).getRef();
+//final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
+//        ref.orderByChild(uid + "/name").addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//        FirebaseUser user = FirebaseAuth.getInstance().signInWithCredential()
+
         AlertDialog alert1 = builder.create();
         alert1.show();
 
