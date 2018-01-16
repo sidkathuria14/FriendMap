@@ -41,10 +41,8 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signin);
 etName = (EditText)findViewById(R.id.name);
         //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("users");
-
+       final FirebaseAuth auth= FirebaseAuth.getInstance();
 
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
         btnSignUp = (Button) findViewById(R.id.sign_up_button);
@@ -108,11 +106,14 @@ etName = (EditText)findViewById(R.id.name);
                                     Toast.makeText(SignupActivity.this, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-//                                  userId = task.getResult().getUser().getUid();
-                                    userId = mDatabase.push().getKey();
-                                    User user = new User(name,email);
-                                    mDatabase.child(userId).setValue(user);
-                                    startActivity(new Intent(SignupActivity.this, MapsActivity.class));
+////                                  userId = task.getResult().getUser().getUid();
+//                                    userId = mDatabase.push().getKey();
+                                   Intent i = new Intent(SignupActivity.this, MapsActivity.class);
+                                  i.putExtra("name",name);
+                                    i.putExtra("email",email);
+
+
+                                    startActivity(i);
                                     finish();
                                 }
                             }

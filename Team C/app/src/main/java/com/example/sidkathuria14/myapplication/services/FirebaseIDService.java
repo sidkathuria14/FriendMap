@@ -9,13 +9,14 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
  * Created by sidkathuria14 on 3/1/18.
  */
 public class FirebaseIDService extends FirebaseInstanceIdService {
-    private static final String TAG = "FirebaseIDService";
+    private static final String TAG = "friendmap";
 
     @Override
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
+
 
         // TODO: Implement this method to send any registration to your app's servers.
         sendRegistrationToServer(refreshedToken);

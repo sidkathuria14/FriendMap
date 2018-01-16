@@ -4,15 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+
     tools:context="com.example.sidkathuria14.myapplication.activities.AddFriend">
-<EditText
-    android:id="@+id/etUserId"
-    android:hint="enter userid of friend to add"
+<TextView
+    android:padding="10dp"
+    android:text="Scan your Friend's unique QR Code to add as a friend!"
+    android:textSize="25sp"
+    android:layout_gravity="center"
+    android:gravity="center"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
-<Button
-    android:id="@+id/btnAdd"
-    android:text="add friend"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <me.dm7.barcodescanner.zxing.ZXingScannerView
+        android:id="@+id/scanner"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+</me.dm7.barcodescanner.zxing.ZXingScannerView>
+</FrameLayout>
 </LinearLayout>

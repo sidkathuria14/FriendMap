@@ -1,5 +1,7 @@
 package com.example.sidkathuria14.myapplication.activities;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.Result;
 
+import static android.os.Build.VERSION_CODES.N;
 import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 
 import java.util.List;
@@ -40,6 +43,9 @@ public class AddFriend extends AppCompatActivity implements ZXingScannerView.Res
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_friend);
+//        mScannerView = new ZXingScannerView(this);
+                mScannerView= (ZXingScannerView) findViewById(R.id.scanner);
 //        setContentView(R.layout.activity_add_friend);
 //        mDatabase = FirebaseDatabase.getInstance().getReference();
 //        mDatabase = FirebaseDatabase.getInstance().getReference("allusers");
@@ -55,24 +61,56 @@ public class AddFriend extends AppCompatActivity implements ZXingScannerView.Res
 //
 //            }
 //        });
-        mScannerView = new ZXingScannerView(this);
-        setContentView(mScannerView);
+//        mScannerView = new ZXingScannerView(this);
+//        setContentView(mScannerView);
     }
 
     @Override
-    public void handleResult(Result result) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    public void handleResult(final Result result) {
+     final  AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Scan Result");
         builder.setMessage(result.getText());
+
         uid = result.getText();
+//        uid = "L2tw9fhZ-dT7Lt8Z2KQ";
         Log.d(TAG, "handleResult: addfriend zxing " + uid);
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser().getUid()
+final String currUID= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance().getReference("users").child(currUID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: " + dataSnapshot.exists());
+                Log.d(TAG, "onDataChange: "  + dataSnapshot.child("name").getValue());
+                FirebaseDatabase.getInstance().getReference("users").child(currUID).child("friend").child(result.getText());
+
+                if(dataSnapshot.exists() == true){
+                    FirebaseDatabase.getInstance().getReference("users").child(currUID).child("friend").setValue(result.getText());
+                    builder.setMessage("Friend successfully added!");
+//                    FirebaseDatabase.getInstance().getReference(currUID).child("friends").setValue(uid);
+                }
+                else {
+                    builder.setMessage("Friend could not be added. Please check the QR Code or try again.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: ");
+            }
+        });
+        Log.d(TAG, "handleResult: " );
+        builder.setNeutralButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                startActivity(new Intent(AddFriend.this,MapsActivity.class));
+            }
+        });
         FirebaseDatabase.getInstance().getReference(uid).orderByChild("name")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-User user = dataSnapshot.getValue(User.class);
-                        Log.d(TAG, "onChildAdded: final vala" + user.name);
+                        User user = dataSnapshot.getValue(User.class);
+                        Log.d(TAG, "onChildAdded: final vala" );
                     }
 
                     @Override
@@ -95,40 +133,6 @@ User user = dataSnapshot.getValue(User.class);
                         Log.d(TAG, "onCancelled: " + databaseError);
                     }
                 });
-
-
-//        Log.d(TAG, "handleResult: " + checkUID);
-//        FirebaseUser user = FirebaseAuth.getInstance().FirebaseDatabase.getInstance().getReference(uid).getDatabase();
-//                orderByKey().equalTo(uid).getRef();
-//final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
-//        ref.orderByChild(uid + "/name").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//        FirebaseUser user = FirebaseAuth.getInstance().signInWithCredential()
-
         AlertDialog alert1 = builder.create();
         alert1.show();
 

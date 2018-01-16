@@ -33,6 +33,7 @@ import static com.example.sidkathuria14.myapplication.helpers.Constants.TAG;
 
 import com.example.sidkathuria14.myapplication.GeoFenceTransitionService;
 import com.example.sidkathuria14.myapplication.R;
+import com.example.sidkathuria14.myapplication.models.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -62,6 +63,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
@@ -107,20 +110,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Circle geoFenceLimits;
     private PendingIntent geoFencePendingIntent;
     private Marker geoFencemarker;
-
+    DatabaseReference mDatabase;
     String uid;
+    String name,email;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+
+        mDatabase = FirebaseDatabase.getInstance().getReference("users");
+
         FirebaseAuth auth= FirebaseAuth.getInstance();
-        FirebaseUser user= auth.getCurrentUser();
-        uid =  user.getUid();
+        FirebaseUser mUser= auth.getCurrentUser();
+        uid =  mUser.getUid();
         Log.d("friendmap", "onCreate: " + uid);
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("firebase_uid",uid);
         editor.commit();
+       name =  getIntent().getStringExtra("name");
+        email = getIntent().getStringExtra("email");
+        User user = new User(name,email);
+        mDatabase.child(uid).setValue(user);
 
 //        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
