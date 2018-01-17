@@ -35,7 +35,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class AddFriend extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     EditText etInput;
     DatabaseReference mDatabase;
-    String email, userId;
+    String friend_name,friend_email, userId;
     public List<User> friendList;
     private ZXingScannerView mScannerView;
     String uid;
@@ -80,7 +80,13 @@ final String currUID= FirebaseAuth.getInstance().getCurrentUser().getUid();
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange: " + dataSnapshot.exists());
                 Log.d(TAG, "onDataChange: "  + dataSnapshot.child("name").getValue());
-                FirebaseDatabase.getInstance().getReference("users").child(currUID).child("friend").child(result.getText());
+                friend_name = String.valueOf(dataSnapshot.child("name").getValue());
+                friend_email = String.valueOf(dataSnapshot.child("email").getValue());
+                String id =String.valueOf(dataSnapshot.child("friend").getValue());
+                Log.d(TAG, "onDataChange: id = " + id);
+                Log.d(TAG, "onDataChange: " + friend_name + " " + friend_email);
+                User user =new User(friend_name,friend_email);
+                FirebaseDatabase.getInstance().getReference("users").child(currUID).child("friend").child(result.getText()).setValue(user);
 
                 if(dataSnapshot.exists() == true){
                     FirebaseDatabase.getInstance().getReference("users").child(currUID).child("friend").setValue(result.getText());
