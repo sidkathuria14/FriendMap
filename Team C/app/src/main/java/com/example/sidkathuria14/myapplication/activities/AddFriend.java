@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.sidkathuria14.myapplication.R;
+import com.example.sidkathuria14.myapplication.helpers.DatabaseHandler;
+import com.example.sidkathuria14.myapplication.models.Friend;
 import com.example.sidkathuria14.myapplication.models.User;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +41,7 @@ public class AddFriend extends AppCompatActivity implements ZXingScannerView.Res
     public List<User> friendList;
     private ZXingScannerView mScannerView;
     String uid;
-
+     DatabaseHandler db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,7 @@ public class AddFriend extends AppCompatActivity implements ZXingScannerView.Res
 //        });
 //        mScannerView = new ZXingScannerView(this);
 //        setContentView(mScannerView);
+         db = new DatabaseHandler(this);
     }
 
     @Override
@@ -83,6 +86,9 @@ final String currUID= FirebaseAuth.getInstance().getCurrentUser().getUid();
                 friend_name = String.valueOf(dataSnapshot.child("name").getValue());
                 friend_email = String.valueOf(dataSnapshot.child("email").getValue());
                 String id =String.valueOf(dataSnapshot.child("friend").getValue());
+                Friend friend = new Friend(friend_name,currUID);
+                db.addFriend(friend);
+                Log.d(TAG, "onDataChange: " + db.getFriendsCount());
                 Log.d(TAG, "onDataChange: id = " + id);
                 Log.d(TAG, "onDataChange: " + friend_name + " " + friend_email);
                 User user =new User(friend_name,friend_email);
